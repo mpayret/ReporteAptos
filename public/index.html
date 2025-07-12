@@ -44,8 +44,8 @@
         key: publicSpreadsheetUrl,
         callback: function(data, tabletop) {
           const hojas = tabletop.modelNames;
-          mostrarDatos(tabletop.sheets(hojas[0]).all(), "tabla1");
-          mostrarDatos(tabletop.sheets(hojas[1]).all(), "tabla2");
+          if (hojas.length >= 1) mostrarDatos(tabletop.sheets(hojas[0]).all(), "tabla1");
+          if (hojas.length >= 2) mostrarDatos(tabletop.sheets(hojas[1]).all(), "tabla2");
         },
         simpleSheet: false
       });
