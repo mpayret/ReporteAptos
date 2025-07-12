@@ -2,69 +2,69 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Reporte aptos</title>
+  <title>Reporte de Aptos</title>
+
+  <!-- Favicon tradicional -->
   <link rel="icon" href="/icono.ico" type="image/x-icon">
-  <link rel="icon" href="/icono.png" type="image/png">
+  <!-- Favicon moderno -->
+  <link rel="icon" href="/icono.png" type="image/png" sizes="32x32">
+  <!-- Open Graph para compatibilidad -->
+  <meta property="og:image" content="/icono.png">
+
   <style>
     body {
       font-family: sans-serif;
-      padding: 20px;
+      padding: 1em;
     }
     table {
       border-collapse: collapse;
       width: 100%;
-      margin-top: 20px;
+      margin-bottom: 2em;
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 8px;
+      padding: 6px 8px;
+      text-align: left;
     }
     th {
-      background-color: #f2f2f2;
+      background-color: #f0f0f0;
     }
   </style>
 </head>
 <body>
-  <h1>Reporte de estado de cuenta de alquileres</h1>
-
-  <h2>Movimientos</h2>
-  <div id="tabla-hoja1">Cargando datos...</div>
-
-  <h2>Etado de cuenta</h2>
-  <div id="tabla-hoja2">Cargando datos...</div>
+  <h1>Reporte de Aptos</h1>
+  <div id="tabla1">Cargando datos...</div>
+  <div id="tabla2">Cargando datos...</div>
 
   <script>
     const hojas = [
       {
-        id: "tabla-hoja1",
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=tsv"
+        id: "tabla1",
+        url: "https://docs.google.com/spreadsheets/d/e/tu-url-1/pub?output=tsv"
       },
       {
-        id: "tabla-hoja2",
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?gid=1328811283&single=true&output=tsv"
+        id: "tabla2",
+        url: "https://docs.google.com/spreadsheets/d/e/tu-url-2/pub?output=tsv"
       }
     ];
 
     function cargarDatos(idElemento, url) {
       fetch(url)
-        .then(response => response.text())
+        .then(respuesta => respuesta.text())
         .then(data => {
-          const rows = data.trim().split("\n").map(row => row.split("\t"));
+          const rows = data.trim().split("\n").map(linea => linea.split("\t"));
           const tabla = document.createElement("table");
 
-          // Cabecera
           const thead = document.createElement("thead");
-          const cabecera = document.createElement("tr");
-          rows[0].forEach(col => {
+          const filaCabecera = document.createElement("tr");
+          rows[0].forEach(celda => {
             const th = document.createElement("th");
-            th.textContent = col;
-            cabecera.appendChild(th);
+            th.textContent = celda;
+            filaCabecera.appendChild(th);
           });
-          thead.appendChild(cabecera);
+          thead.appendChild(filaCabecera);
           tabla.appendChild(thead);
 
-          // Cuerpo
           const tbody = document.createElement("tbody");
           rows.slice(1).forEach(fila => {
             const tr = document.createElement("tr");
@@ -91,3 +91,4 @@
   </script>
 </body>
 </html>
+
