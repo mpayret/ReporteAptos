@@ -1,62 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Datos desde Google Sheets</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
   </style>
 </head>
 <body>
   <h1>Datos desde Google Sheets</h1>
-  <h2>Hoja 1</h2>
-  <div id="tabla1">Cargando hoja 1...</div>
-
-  <h2>Hoja 2</h2>
-  <div id="tabla2">Cargando hoja 2...</div>
+  <div id="tabla-container">Cargando datos...</div>
 
   <script>
-    const hojas = [
-      {
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2Me7mLywRjVefRjzLHiVaPlIDMFU0m7QW0-1o9UKnvK6pvnLgGvl94Y40FQ2HkV2y-QYPUgvbr2tn/pub?gid=0&single=true&output=csv",
-        contenedor: "tabla1"
-      },
-      {
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2Me7mLywRjVefRjzLHiVaPlIDMFU0m7QW0-1o9UKnvK6pvnLgGvl94Y40FQ2HkV2y-QYPUgvbr2tn/pub?gid=1328811283&single=true&output=csv",
-        contenedor: "tabla2"
-      }
-    ];
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=csv";
 
-    function parseCSV(csv) {
-      const lines = csv.trim().split("\n");
-      const headers = lines[0].split(",");
-      const rows = lines.slice(1).map(line => line.split(","));
-      let html = "<table><thead><tr>";
-      headers.forEach(h => html += `<th>${h}</th>`);
-      html += "</tr></thead><tbody>";
-      rows.forEach(r => {
-        html += "<tr>";
-        r.forEach(col => html += `<td>${col}</td>`);
-        html += "</tr>";
-      });
-      html += "</tbody></table>";
-      return html;
-    }
+    fetch(url)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.trim().split("\n").map(row => row.split(","));
+        const tablaHTML = document.createElement("table");
 
-    hojas.forEach(({ url, contenedor }) => {
-      fetch(url)
-        .then(res => res.text())
-        .then(csv => {
-          document.getElementById(contenedor).innerHTML = parseCSV(csv);
-        })
-        .catch(err => {
-          document.getElementById(contenedor).innerHTML = "<p>Error al cargar los datos.</p>";
-          console.error("Error al obtener CSV:", err);
+        // Cabeceras
+        const thead = document.createElement("thead");
+        const cabecera = document.createElement("tr");
+        rows[0].forEach(col => {
+          const th = document.createElement("th");
+          th.textContent = col;
+          cabecera.appendChild(th);
         });
-    });
+        thead.appendChild(cabecera);
+        tablaHTML.appendChild(thead);
+
+        // Cuerpo
+        const tbody = document.createElement("tbody");
+        rows.slice(1).forEach(fila => {
+          const tr = document.createElement("tr");
+          fila.forEach(celda => {
+            const td = document.createElement("td");
+            td.textContent = celda;
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        });
+        tablaHTML.appendChild(tbody);
+
+        document.getElementById("tabla-container").innerHTML = "";
+        document.getElementById("tabla-container").appendChild(tablaHTML);
+      })
+      .catch(error => {
+        document.getElementById("tabla-container").textContent = "Error al cargar los datos.";
+        console.error("Error:", error);
+      });
   </script>
 </body>
 </html>
