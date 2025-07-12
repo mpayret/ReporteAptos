@@ -2,8 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Datos de Google Sheets</title>
-  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.4/tabletop.min.js"></script>
+  <title>Datos desde Google Sheets</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
@@ -13,42 +12,50 @@
 </head>
 <body>
   <h1>Datos desde Google Sheets</h1>
-  <div id="tabla1"></div>
-  <div id="tabla2"></div>
+  <h2>Hoja 1</h2>
+  <div id="tabla1">Cargando hoja 1...</div>
+
+  <h2>Hoja 2</h2>
+  <div id="tabla2">Cargando hoja 2...</div>
 
   <script>
-    const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pubhtml';
-
-    function mostrarDatos(sheetData, contenedorId) {
-      const contenedor = document.getElementById(contenedorId);
-      if (!sheetData || sheetData.length === 0) {
-        contenedor.innerHTML = "<p>No hay datos para mostrar.</p>";
-        return;
+    const hojas = [
+      {
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2Me7mLywRjVefRjzLHiVaPlIDMFU0m7QW0-1o9UKnvK6pvnLgGvl94Y40FQ2HkV2y-QYPUgvbr2tn/pub?gid=0&single=true&output=csv",
+        contenedor: "tabla1"
+      },
+      {
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR2Me7mLywRjVefRjzLHiVaPlIDMFU0m7QW0-1o9UKnvK6pvnLgGvl94Y40FQ2HkV2y-QYPUgvbr2tn/pub?gid=1328811283&single=true&output=csv",
+        contenedor: "tabla2"
       }
+    ];
 
-      let html = '<table><thead><tr>';
-      const columnas = Object.keys(sheetData[0]);
-      columnas.forEach(col => html += `<th>${col}</th>`);
-      html += '</tr></thead><tbody>';
-      sheetData.forEach(fila => {
-        html += '<tr>';
-        columnas.forEach(col => html += `<td>${fila[col] || ''}</td>`);
-        html += '</tr>';
+    function parseCSV(csv) {
+      const lines = csv.trim().split("\n");
+      const headers = lines[0].split(",");
+      const rows = lines.slice(1).map(line => line.split(","));
+      let html = "<table><thead><tr>";
+      headers.forEach(h => html += `<th>${h}</th>`);
+      html += "</tr></thead><tbody>";
+      rows.forEach(r => {
+        html += "<tr>";
+        r.forEach(col => html += `<td>${col}</td>`);
+        html += "</tr>";
       });
-      html += '</tbody></table>';
-      contenedor.innerHTML = html;
+      html += "</tbody></table>";
+      return html;
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      Tabletop.init({
-        key: publicSpreadsheetUrl,
-        callback: function(data, tabletop) {
-          const hojas = tabletop.modelNames;
-          if (hojas.length >= 1) mostrarDatos(tabletop.sheets(hojas[0]).all(), "tabla1");
-          if (hojas.length >= 2) mostrarDatos(tabletop.sheets(hojas[1]).all(), "tabla2");
-        },
-        simpleSheet: false
-      });
+    hojas.forEach(({ url, contenedor }) => {
+      fetch(url)
+        .then(res => res.text())
+        .then(csv => {
+          document.getElementById(contenedor).innerHTML = parseCSV(csv);
+        })
+        .catch(err => {
+          document.getElementById(contenedor).innerHTML = "<p>Error al cargar los datos.</p>";
+          console.error("Error al obtener CSV:", err);
+        });
     });
   </script>
 </body>
