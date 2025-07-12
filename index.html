@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Datos de Google Sheets</title>
+  <script src="https://cdn.jsdelivr.net/npm/tabletop@1.6.4/tabletop.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Datos desde Google Sheets</h1>
+  <div id="tabla1"></div>
+  <div id="tabla2"></div>
+
+  <script>
+    const publicSpreadsheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pubhtml';
+
+    function mostrarDatos(sheetData, contenedorId) {
+      const contenedor = document.getElementById(contenedorId);
+      if (!sheetData || sheetData.length === 0) {
+        contenedor.innerHTML = "<p>No hay datos para mostrar.</p>";
+        return;
+      }
+
+      let html = '<table><thead><tr>';
+      const columnas = Object.keys(sheetData[0]);
+      columnas.forEach(col => html += `<th>${col}</th>`);
+      html += '</tr></thead><tbody>';
+      sheetData.forEach(fila => {
+        html += '<tr>';
+        columnas.forEach(col => html += `<td>${fila[col] || ''}</td>`);
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      contenedor.innerHTML = html;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      Tabletop.init({
+        key: publicSpreadsheetUrl,
+        callback: function(data, tabletop) {
+          const hojas = tabletop.modelNames;
+          mostrarDatos(tabletop.sheets(hojas[0]).all(), "tabla1");
+          mostrarDatos(tabletop.sheets(hojas[1]).all(), "tabla2");
+        },
+        simpleSheet: false
+      });
+    });
+  </script>
+</body>
+</html>
