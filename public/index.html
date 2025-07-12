@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Datos desde Google Sheets</title>
+  <title>Datos desde Google Sheets (TSV)</title>
   <style>
     body {
       font-family: sans-serif;
@@ -36,11 +36,11 @@
     const hojas = [
       {
         id: "tabla-hoja1",
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=csv"
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=tsv"
       },
       {
         id: "tabla-hoja2",
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?gid=1328811283&single=true&output=csv"
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?gid=1328811283&single=true&output=tsv"
       }
     ];
 
@@ -48,7 +48,7 @@
       fetch(url)
         .then(response => response.text())
         .then(data => {
-          const rows = data.trim().split("\n").map(row => row.split(","));
+          const rows = data.trim().split("\n").map(row => row.split("\t"));
           const tabla = document.createElement("table");
 
           // Cabecera
