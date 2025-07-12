@@ -25,48 +25,67 @@
 </head>
 <body>
   <h1>Datos desde Google Sheets</h1>
-  <div id="tabla-container">Cargando datos...</div>
+
+  <h2>Hoja 1</h2>
+  <div id="tabla-hoja1">Cargando datos...</div>
+
+  <h2>Hoja 2</h2>
+  <div id="tabla-hoja2">Cargando datos...</div>
 
   <script>
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=csv";
+    const hojas = [
+      {
+        id: "tabla-hoja1",
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?output=csv"
+      },
+      {
+        id: "tabla-hoja2",
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSRoqjMHGOvIkJgLKpzT65oDQ9xqiA_BdtXtkr9P2hsz4XOtrUq_9qiYLKnEcus9h3AolLbEqS9iQIF/pub?gid=1328811283&single=true&output=csv"
+      }
+    ];
 
-    fetch(url)
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.trim().split("\n").map(row => row.split(","));
-        const tablaHTML = document.createElement("table");
+    function cargarDatos(idElemento, url) {
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          const rows = data.trim().split("\n").map(row => row.split(","));
+          const tabla = document.createElement("table");
 
-        // Cabeceras
-        const thead = document.createElement("thead");
-        const cabecera = document.createElement("tr");
-        rows[0].forEach(col => {
-          const th = document.createElement("th");
-          th.textContent = col;
-          cabecera.appendChild(th);
-        });
-        thead.appendChild(cabecera);
-        tablaHTML.appendChild(thead);
-
-        // Cuerpo
-        const tbody = document.createElement("tbody");
-        rows.slice(1).forEach(fila => {
-          const tr = document.createElement("tr");
-          fila.forEach(celda => {
-            const td = document.createElement("td");
-            td.textContent = celda;
-            tr.appendChild(td);
+          // Cabecera
+          const thead = document.createElement("thead");
+          const cabecera = document.createElement("tr");
+          rows[0].forEach(col => {
+            const th = document.createElement("th");
+            th.textContent = col;
+            cabecera.appendChild(th);
           });
-          tbody.appendChild(tr);
-        });
-        tablaHTML.appendChild(tbody);
+          thead.appendChild(cabecera);
+          tabla.appendChild(thead);
 
-        document.getElementById("tabla-container").innerHTML = "";
-        document.getElementById("tabla-container").appendChild(tablaHTML);
-      })
-      .catch(error => {
-        document.getElementById("tabla-container").textContent = "Error al cargar los datos.";
-        console.error("Error:", error);
-      });
+          // Cuerpo
+          const tbody = document.createElement("tbody");
+          rows.slice(1).forEach(fila => {
+            const tr = document.createElement("tr");
+            fila.forEach(celda => {
+              const td = document.createElement("td");
+              td.textContent = celda;
+              tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+          });
+          tabla.appendChild(tbody);
+
+          const contenedor = document.getElementById(idElemento);
+          contenedor.innerHTML = "";
+          contenedor.appendChild(tabla);
+        })
+        .catch(error => {
+          document.getElementById(idElemento).textContent = "Error al cargar los datos.";
+          console.error("Error:", error);
+        });
+    }
+
+    hojas.forEach(hoja => cargarDatos(hoja.id, hoja.url));
   </script>
 </body>
 </html>
