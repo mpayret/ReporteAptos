@@ -132,7 +132,7 @@ function cargarDatos(idElemento, url) {
       rows.slice(1).forEach((fila, i, arr) => {
         const tr = document.createElement("tr");
 
-        const esUltimaFila = idElemento === "tabla-hoja2" && i === arr.length - 2;
+        const esUltimaFila = idElemento === "tabla-hoja2" && i === rows.length - 2;
         const esFilaEspecial = idElemento === "tabla-hoja2" && fila[0]?.trim().toLowerCase() === "fecha";
 
         if (esUltimaFila) tr.classList.add("fila-final");
