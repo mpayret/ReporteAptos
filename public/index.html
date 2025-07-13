@@ -77,8 +77,13 @@
     ];
 
     function esNumero(valor) {
-      const limpio = valor.replace(/[.,]/g, "").replace(/\s/g, "");
-      return !isNaN(valor) && !isNaN(parseFloat(limpio));
+      // Remueve símbolos de moneda y separadores comunes
+      const limpio = valor.replace(/[$€U$S\s]/g, "").replace(/\./g, "").replace(",", ".");
+      return !isNaN(limpio) && limpio !== "";
+    }
+
+    function esFecha(valor) {
+      return /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(valor) || /^\d{4}-\d{2}-\d{2}$/.test(valor);
     }
 
     function cargarDatos(idElemento, url) {
@@ -107,7 +112,7 @@
               const td = document.createElement("td");
               td.textContent = celda;
 
-              if (esNumero(celda)) {
+              if (esNumero(celda) || esFecha(celda)) {
                 td.classList.add("num");
               }
 
