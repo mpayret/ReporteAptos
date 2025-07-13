@@ -79,6 +79,11 @@
 #tabla-hoja2 table thead tr th {
   text-align: center;
 }
+
+/* Clase para línea doble entre filas */
+.linea-doble {
+  border-bottom: 3px double #000 !important;
+}
 </style>
 </head>
 <body>
@@ -113,67 +118,69 @@
       return /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(valor) || /^\d{4}-\d{2}-\d{2}$/.test(valor);
     }
 
-function cargarDatos(idElemento, url) {
-  fetch(url)
-    .then(response => response.text())
-    .then(data => {
-      const rows = data.trim().split("\n").map(row => row.split("\t"));
-      const tabla = document.createElement("table");
+    function cargarDatos(idElemento, url) {
+      fetch(url)
+        .then(response => response.text())
+        .then(data => {
+          const rows = data.trim().split("\n").map(row => row.split("\t"));
+          const tabla = document.createElement("table");
 
-      // Crear cabecera desde la primera fila
-      const thead = document.createElement("thead");
-      const cabecera = document.createElement("tr");
-      rows[0].forEach(col => {
-        const th = document.createElement("th");
-        th.textContent = col;
-        cabecera.appendChild(th);
-      });
-      thead.appendChild(cabecera);
-      tabla.appendChild(thead);
+          // Crear cabecera desde la primera fila
+          const thead = document.createElement("thead");
+          const cabecera = document.createElement("tr");
+          rows[0].forEach(col => {
+            const th = document.createElement("th");
+            th.textContent = col;
+            cabecera.appendChild(th);
+          });
+          thead.appendChild(cabecera);
+          tabla.appendChild(thead);
 
-      // Crear cuerpo
-      const tbody = document.createElement("tbody");
-      rows.slice(1).forEach((fila, i, arr) => {
-        const tr = document.createElement("tr");
+          // Crear cuerpo
+          const tbody = document.createElement("tbody");
+          rows.slice(1).forEach((fila, i, arr) => {
+            const tr = document.createElement("tr");
 
-        const esUltimaFila = idElemento === "tabla-hoja2" && i === rows.length - 2;
-        const esFilaEspecial = idElemento === "tabla-hoja2" && fila[0]?.trim().toLowerCase() === "fecha";
+            const esUltimaFila = idElemento === "tabla-hoja2" && i === rows.length - 2;
+            const esFilaEspecial = idElemento === "tabla-hoja2" && fila[0]?.trim().toLowerCase() === "fecha";
 
-        if (esUltimaFila) tr.classList.add("fila-final");
-        if (esFilaEspecial) tr.classList.add("fila-encabezado");
+            if (esUltimaFila) tr.classList.add("fila-final");
+            if (esFilaEspecial) tr.classList.add("fila-encabezado");
 
-        fila.forEach(celda => {
-          const td = document.createElement("td");
-          td.textContent = celda;
+            // Línea doble entre filas 4 y 5 (índice 3)
+            if (idElemento === "tabla-hoja2" && i === 3) {
+              tr.classList.add("linea-doble");
+            }
 
-          if (esNumero(celda) || esFecha(celda)) {
-            td.classList.add("num");
-          }
+            fila.forEach(celda => {
+              const td = document.createElement("td");
+              td.textContent = celda;
 
-          if (idElemento === "tabla-hoja2" && celda.trim() === "Compras de USD") {
-            td.classList.add("usd");
-          }
+              if (esNumero(celda) || esFecha(celda)) {
+                td.classList.add("num");
+              }
 
-          tr.appendChild(td);
+              if (idElemento === "tabla-hoja2" && celda.trim() === "Compras de USD") {
+                td.classList.add("usd");
+              }
+
+              tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+          });
+
+          tabla.appendChild(tbody);
+
+          const contenedor = document.getElementById(idElemento);
+          contenedor.innerHTML = "";
+          contenedor.appendChild(tabla);
+        })
+        .catch(error => {
+          document.getElementById(idElemento).textContent = "Error al cargar los datos.";
+          console.error("Error:", error);
         });
-
-        tbody.appendChild(tr);
-      });
-
-      tabla.appendChild(tbody);
-
-      const contenedor = document.getElementById(idElemento);
-      contenedor.innerHTML = "";
-      contenedor.appendChild(tabla);
-    })
-    .catch(error => {
-      document.getElementById(idElemento).textContent = "Error al cargar los datos.";
-      console.error("Error:", error);
-    });
-}
-
-
-
+    }
 
     hojas.forEach(hoja => cargarDatos(hoja.id, hoja.url));
   </script>
