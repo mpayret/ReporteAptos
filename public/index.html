@@ -61,11 +61,20 @@
     font-weight: bold;
   }
 
-  .usd {
-    font-weight: bold;
-    font-family: "Courier New", monospace;
-    background-color: #fff3cd; /* opcional: fondo amarillo claro */
-  }
+   .fila-encabezado {
+  background-color: #007bff !important;
+  color: white;
+  font-weight: bold;
+}
+.fila-encabezado td {
+  border-bottom: 1px solid #ddd;
+}
+.usd {
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  background-color: #fff3cd;
+}
+
 </style>
 </head>
 <body>
@@ -107,39 +116,36 @@ function cargarDatos(idElemento, url) {
       const rows = data.trim().split("\n").map(row => row.split("\t"));
       const tabla = document.createElement("table");
 
-      let encabezadoExtraIndex = -1;
-
+      // Crear cabecera desde la primera fila
       const thead = document.createElement("thead");
-      const tbody = document.createElement("tbody");
+      const cabecera = document.createElement("tr");
+      rows[0].forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        cabecera.appendChild(th);
+      });
+      thead.appendChild(cabecera);
+      tabla.appendChild(thead);
 
+      // Crear cuerpo
+      const tbody = document.createElement("tbody");
       rows.slice(1).forEach((fila, i, arr) => {
-        const esUltimaFila = (idElemento === "tabla-hoja2") && (i === arr.length - 1);
         const tr = document.createElement("tr");
 
-        // Detectar si esta fila debe ser encabezado extra (empieza con "Fecha")
-        const esEncabezadoExtra = idElemento === "tabla-hoja2" && fila[0]?.trim().toLowerCase() === "fecha";
+        const esUltimaFila = idElemento === "tabla-hoja2" && i === arr.length - 2;
+        const esFilaEspecial = idElemento === "tabla-hoja2" && fila[0]?.trim().toLowerCase() === "fecha";
 
-        if (esEncabezadoExtra) {
-          encabezadoExtraIndex = i + 1; // evitar duplicar como cuerpo
-          fila.forEach(col => {
-            const th = document.createElement("th");
-            th.textContent = col;
-            thead.appendChild(tr);
-            tr.appendChild(th);
-          });
-          return; // saltar esta fila como parte del cuerpo
-        }
+        if (esUltimaFila) tr.classList.add("fila-final");
+        if (esFilaEspecial) tr.classList.add("fila-encabezado");
 
         fila.forEach(celda => {
           const td = document.createElement("td");
           td.textContent = celda;
 
-          // Alineación si es número, moneda o fecha
           if (esNumero(celda) || esFecha(celda)) {
             td.classList.add("num");
           }
 
-          // Estilo especial para "Compras de USD"
           if (idElemento === "tabla-hoja2" && celda.trim() === "Compras de USD") {
             td.classList.add("usd");
           }
@@ -147,11 +153,9 @@ function cargarDatos(idElemento, url) {
           tr.appendChild(td);
         });
 
-        if (esUltimaFila) tr.classList.add("fila-final");
         tbody.appendChild(tr);
       });
 
-      tabla.appendChild(thead);
       tabla.appendChild(tbody);
 
       const contenedor = document.getElementById(idElemento);
@@ -163,6 +167,7 @@ function cargarDatos(idElemento, url) {
       console.error("Error:", error);
     });
 }
+
 
 
 
