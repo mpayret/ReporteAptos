@@ -55,6 +55,11 @@
     overflow-x: auto;
     max-width: 100%;
   }
+
+  .fila-final {
+  background-color: #d4edda !important; /* verde claro */
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -88,51 +93,59 @@
       return /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(valor) || /^\d{4}-\d{2}-\d{2}$/.test(valor);
     }
 
-    function cargarDatos(idElemento, url) {
-      fetch(url)
-        .then(response => response.text())
-        .then(data => {
-          const rows = data.trim().split("\n").map(row => row.split("\t"));
-          const tabla = document.createElement("table");
+function cargarDatos(idElemento, url) {
+  fetch(url)
+    .then(response => response.text())
+    .then(data => {
+      const rows = data.trim().split("\n").map(row => row.split("\t"));
+      const tabla = document.createElement("table");
 
-          // Cabecera
-          const thead = document.createElement("thead");
-          const cabecera = document.createElement("tr");
-          rows[0].forEach(col => {
-            const th = document.createElement("th");
-            th.textContent = col;
-            cabecera.appendChild(th);
-          });
-          thead.appendChild(cabecera);
-          tabla.appendChild(thead);
+      // Cabecera
+      const thead = document.createElement("thead");
+      const cabecera = document.createElement("tr");
+      rows[0].forEach(col => {
+        const th = document.createElement("th");
+        th.textContent = col;
+        cabecera.appendChild(th);
+      });
+      thead.appendChild(cabecera);
+      tabla.appendChild(thead);
 
-          // Cuerpo
-          const tbody = document.createElement("tbody");
-          rows.slice(1).forEach(fila => {
-            const tr = document.createElement("tr");
-            fila.forEach(celda => {
-              const td = document.createElement("td");
-              td.textContent = celda;
+      // Cuerpo
+      const tbody = document.createElement("tbody");
+      rows.slice(1).forEach((fila, i, arr) => {
+        const tr = document.createElement("tr");
 
-              if (esNumero(celda) || esFecha(celda)) {
-                td.classList.add("num");
-              }
+        // Marcar la última fila solo en la segunda tabla
+        const esUltimaFila = (idElemento === "tabla-hoja2") && (i === arr.length - 1);
+        if (esUltimaFila) tr.classList.add("fila-final");
 
-              tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-          });
-          tabla.appendChild(tbody);
+        fila.forEach(celda => {
+          const td = document.createElement("td");
+          td.textContent = celda;
 
-          const contenedor = document.getElementById(idElemento);
-          contenedor.innerHTML = "";
-          contenedor.appendChild(tabla);
-        })
-        .catch(error => {
-          document.getElementById(idElemento).textContent = "Error al cargar los datos.";
-          console.error("Error:", error);
+          if (esNumero(celda) || esFecha(celda)) {
+            td.classList.add("num");
+          }
+
+          tr.appendChild(td);
         });
-    }
+
+        tbody.appendChild(tr);
+      });
+
+      tabla.appendChild(tbody);
+
+      const contenedor = document.getElementById(idElemento);
+      contenedor.innerHTML = "";
+      contenedor.appendChild(tabla);
+    })
+    .catch(error => {
+      document.getElementById(idElemento).textContent = "Error al cargar los datos.";
+      console.error("Error:", error);
+    });
+}
+
 
     hojas.forEach(hoja => cargarDatos(hoja.id, hoja.url));
   </script>
